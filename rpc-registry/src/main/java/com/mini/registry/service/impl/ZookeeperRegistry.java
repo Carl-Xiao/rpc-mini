@@ -1,5 +1,7 @@
 package com.mini.registry.service.impl;
 
+import com.mini.registry.loadbalance.LoadBalance;
+import com.mini.registry.loadbalance.impl.ZkConstanHashLoadBalance;
 import com.mini.registry.model.ServiceMeta;
 import com.mini.registry.service.RpcServiceHelper;
 import com.mini.registry.service.ServiceRegistry;
@@ -11,12 +13,14 @@ import org.apache.curator.x.discovery.ServiceDiscoveryBuilder;
 import org.apache.curator.x.discovery.ServiceInstance;
 import org.apache.curator.x.discovery.details.JsonInstanceSerializer;
 
+import java.util.Collection;
+import java.util.List;
+
 /**
  * @author carl-xiao
  * @description zk注册服务
  **/
 public class ZookeeperRegistry implements ServiceRegistry {
-
     /**
      * 间隔休眠
      */
@@ -33,6 +37,7 @@ public class ZookeeperRegistry implements ServiceRegistry {
      * 注册中心
      */
     private final ServiceDiscovery<ServiceMeta> serviceDiscovery;
+
 
     public ZookeeperRegistry(String registryAddr) throws Exception {
         /**
@@ -86,9 +91,16 @@ public class ZookeeperRegistry implements ServiceRegistry {
     }
 
     @Override
-    public ServiceMeta discovery(String serviceName) throws Exception {
-
-
+    public ServiceMeta discovery(String serviceName, int hashcode) throws Exception {
+        Collection<ServiceInstance<ServiceMeta>> serviceInstances = serviceDiscovery.queryForInstances(serviceName);
+        //默认使用一致性hash算法寻址节点
+        LoadBalance<ServiceInstance<ServiceMeta>> loadBalance = new ZkConstanHashLoadBalance();
+        //寻址注册服务
+        ServiceInstance<ServiceMeta> serviceInstance = loadBalance.select((List<ServiceInstance<ServiceMeta>>) serviceInstances,
+                hashcode);
+        if (null != serviceInstance) {
+            return serviceInstance.getPayload();
+        }
         return null;
     }
 

@@ -1,0 +1,1 @@
+zkLoadBalance=com.mini.registry.loadbalance.impl.ZkConstanHashLoadBalance
