@@ -3,11 +3,12 @@ package com.mini.remoting.netty;
 import com.mini.extention.ExtensionLoader;
 import com.mini.factory.SingletonFactory;
 import com.mini.model.MiniRpcRequest;
+import com.mini.model.MiniRpcResponse;
 import com.mini.protocol.MsgProtocol;
 import com.mini.registry.model.ServiceMeta;
+import com.mini.registry.service.RpcServiceHelper;
 import com.mini.registry.service.ServiceRegistry;
 import com.mini.remoting.AbstractClient;
-import com.mini.remoting.model.RpcRequest;
 import com.mini.remoting.netty.codec.MiniRpcDecoder;
 import com.mini.remoting.netty.handler.NettyRpcClientHandler;
 import io.netty.bootstrap.Bootstrap;
@@ -42,8 +43,6 @@ public class NettyRpcClient implements AbstractClient {
         bootstrap.group(eventLoopGroup)
                 .channel(NioSocketChannel.class)
                 .handler(new LoggingHandler(LogLevel.INFO))
-                //  The timeout period of the connection.
-                //  If this time is exceeded or the connection cannot be established, the connection fails.
                 .option(ChannelOption.CONNECT_TIMEOUT_MILLIS, 5000)
                 .handler(new ChannelInitializer<SocketChannel>() {
                     @Override
@@ -62,18 +61,34 @@ public class NettyRpcClient implements AbstractClient {
     }
 
     @Override
-    public Object sendRpcRequest(MsgProtocol<MiniRpcRequest> protocol, ServiceRegistry registryService) {
+    public CompletableFuture<MiniRpcResponse> sendRpcRequest(MsgProtocol<MiniRpcRequest> protocol, ServiceRegistry registryService) {
+        CompletableFuture<MiniRpcResponse> resultFuture = new CompletableFuture<>();
         MiniRpcRequest request = protocol.getBody();
         Object[] params = request.getParams();
-        //TODO hashCode
-        String serviceKey = "";
-        int invokerHashCode = 0;
+        String serviceKey = RpcServiceHelper.buildServiceKey(request.getClassName(), request.getServiceVersion());
+        int invokerHashCode = params.length > 0 ? params[0].hashCode() : serviceKey.hashCode();
         try {
             ServiceMeta serviceMetadata = registryService.discovery(serviceKey, invokerHashCode);
+            String addr = serviceMetadata.getServiceAddr();
+            int port = serviceMetadata.getServicePort();
+            InetSocketAddress socketAddress = new InetSocketAddress(addr, port);
+            //发送请求
+            Channel channel = getChannel(socketAddress);
+            if (channel.isActive()) {
+                channel.writeAndFlush(protocol).addListener((ChannelFutureListener) future -> {
+                    if (future.isSuccess()) {
+                        log.info("client send message: [{}]", protocol.toString());
+                    } else {
+                        future.channel().close();
+                        resultFuture.completeExceptionally(future.cause());
+                        log.error("Send failed:", future.cause());
+                    }
+                });
+            }
         } catch (Exception e) {
             e.printStackTrace();
         }
-        return null;
+        return resultFuture;
     }
 
     public Channel getChannel(InetSocketAddress inetSocketAddress) throws Exception {

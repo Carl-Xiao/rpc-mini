@@ -1,12 +1,16 @@
-package com.mini.rpc.proxy;
+package com.mini.remoting.proxy;
 
 import com.mini.model.MiniRpcRequest;
+import com.mini.model.MiniRpcResponse;
 import com.mini.protocol.*;
 import com.mini.registry.service.ServiceRegistry;
+import com.mini.remoting.AbstractClient;
+import com.mini.remoting.netty.NettyRpcClient;
 import com.mini.serialization.SerializationTypeEnum;
 
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
+import java.util.concurrent.CompletableFuture;
 
 /**
  * @author carl-xiao
@@ -17,11 +21,14 @@ public class RpcProxyHandler implements InvocationHandler {
     private final String serviceVersion;
     private final long timeout;
     private final ServiceRegistry registryService;
+    private final AbstractClient rpcRequestTransport;
 
-    public RpcProxyHandler(String serviceVersion, long timeout, ServiceRegistry registryService) {
+    public RpcProxyHandler(String serviceVersion, long timeout,
+                           ServiceRegistry registryService, AbstractClient abstractClient) {
         this.serviceVersion = serviceVersion;
         this.timeout = timeout;
         this.registryService = registryService;
+        this.rpcRequestTransport = abstractClient;
     }
 
     @Override
@@ -46,9 +53,11 @@ public class RpcProxyHandler implements InvocationHandler {
         request.setParams(args);
         protocol.setBody(request);
         //send请求
-
-
-
-        return null;
+        MiniRpcResponse rpcResponse = null;
+        if (rpcRequestTransport instanceof NettyRpcClient) {
+            CompletableFuture<MiniRpcResponse> completableFuture = rpcRequestTransport.sendRpcRequest(protocol, registryService);
+            rpcResponse = completableFuture.get();
+        }
+        return rpcResponse.getData();
     }
 }
