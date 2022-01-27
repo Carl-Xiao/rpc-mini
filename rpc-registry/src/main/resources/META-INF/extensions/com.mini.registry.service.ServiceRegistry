@@ -1,1 +1,1 @@
-zk=com.mini.registry.service.impl.SpIRegistry
+zk=com.mini.registry.service.impl.ZookeeperRegistry

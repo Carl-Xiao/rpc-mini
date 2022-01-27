@@ -10,21 +10,22 @@ import com.mini.serialization.SerializationTypeEnum;
 
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
+import java.lang.reflect.Proxy;
 import java.util.concurrent.CompletableFuture;
 
 /**
  * @author carl-xiao
  * @description 代理类
  **/
-public class RpcProxyHandler implements InvocationHandler {
+public class RpcProxy implements InvocationHandler {
 
     private final String serviceVersion;
     private final long timeout;
     private final ServiceRegistry registryService;
     private final AbstractClient rpcRequestTransport;
 
-    public RpcProxyHandler(String serviceVersion, long timeout,
-                           ServiceRegistry registryService, AbstractClient abstractClient) {
+    public RpcProxy(String serviceVersion, long timeout,
+                    ServiceRegistry registryService, AbstractClient abstractClient) {
         this.serviceVersion = serviceVersion;
         this.timeout = timeout;
         this.registryService = registryService;
@@ -59,5 +60,15 @@ public class RpcProxyHandler implements InvocationHandler {
             rpcResponse = completableFuture.get();
         }
         return rpcResponse.getData();
+    }
+    /**
+     * 代理类初始化
+     *
+     * @param clazz
+     * @param <T>
+     * @return
+     */
+    public <T> T getProxy(Class<T> clazz) {
+        return (T) Proxy.newProxyInstance(clazz.getClassLoader(), new Class<?>[]{clazz}, this);
     }
 }

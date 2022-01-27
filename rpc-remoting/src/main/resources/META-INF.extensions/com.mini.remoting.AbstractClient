@@ -1,0 +1,1 @@
+netty=com.mini.registry.loadbalance.impl.ZkConstanHashLoadBalance

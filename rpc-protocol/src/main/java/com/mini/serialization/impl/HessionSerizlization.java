@@ -3,7 +3,6 @@ package com.mini.serialization.impl;
 import com.caucho.hessian.io.HessianSerializerInput;
 import com.caucho.hessian.io.HessianSerializerOutput;
 import com.mini.serialization.RpcSerialization;
-import com.sun.xml.internal.ws.encoding.soap.SerializationException;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -35,7 +34,7 @@ public class HessionSerizlization implements RpcSerialization {
             hessianOutput.flush();
             results = byteOutPut.toByteArray();
         } catch (Exception e) {
-            throw new SerializationException(e);
+            throw new RuntimeException(e);
         }
         return results;
     }
@@ -50,7 +49,7 @@ public class HessionSerizlization implements RpcSerialization {
             HessianSerializerInput hessianInput = new HessianSerializerInput(is);
             result = (T) hessianInput.readObject(clz);
         } catch (Exception e) {
-            throw new SerializationException(e);
+            throw new RuntimeException(e);
         }
         return result;
     }

@@ -1,7 +1,5 @@
 package com.registry;
 
-import com.mini.extention.ExtensionLoader;
-import com.mini.registry.service.ServiceRegistry;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.Test;
 
@@ -14,7 +12,7 @@ public class SpiTest {
 
     @Test
     public void SpiTest() {
-        ServiceRegistry serviceRegistry = ExtensionLoader.getExtensionLoader(ServiceRegistry.class).getExtension("zk");
-        System.out.println(serviceRegistry.toString());
+//        ServiceRegistry serviceRegistry = ExtensionLoader.getExtensionLoader(ServiceRegistry.class).getExtension("zk");
+//        System.out.println(serviceRegistry.toString());
     }
 }
