@@ -1,7 +1,8 @@
 package com.remoting;
 
 import com.mini.extention.ExtensionLoader;
-import com.mini.remoting.AbstractClient;
+import com.mini.registry.service.ServiceRegistry;
+import com.mini.sc.Hello;
 import org.junit.Test;
 
 /**
@@ -12,8 +13,15 @@ public class SpiTest {
 
     @Test
     public void SpiTest() {
-        AbstractClient serviceRegistry = ExtensionLoader.getExtensionLoader(AbstractClient.class).getExtension("netty");
+        Hello serviceRegistry = ExtensionLoader.getExtensionLoader(Hello.class).getExtension("zc");
         System.out.println(serviceRegistry.toString());
     }
+
+    @Test
+    public void SpiTest2() {
+        ServiceRegistry serviceRegistry = ExtensionLoader.getExtensionLoader(ServiceRegistry.class).getExtension("zk");
+        System.out.println(serviceRegistry.toString());
+    }
+
 
 }

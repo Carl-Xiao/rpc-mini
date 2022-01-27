@@ -35,7 +35,6 @@ public class NettyRpcClient implements AbstractClient {
     private final ChannelProvider channelProvider;
     private final Bootstrap bootstrap;
     private final EventLoopGroup eventLoopGroup;
-    private final ServiceRegistry serviceRegistry;
 
     public NettyRpcClient() {
         eventLoopGroup = new NioEventLoopGroup();
@@ -56,7 +55,6 @@ public class NettyRpcClient implements AbstractClient {
                     }
                 });
         //注册中心
-        this.serviceRegistry = ExtensionLoader.getExtensionLoader(ServiceRegistry.class).getExtension("zk");
         this.channelProvider = SingletonFactory.getInstance(ChannelProvider.class);
     }
 

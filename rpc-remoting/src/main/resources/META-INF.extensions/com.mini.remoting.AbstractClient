@@ -1,1 +1,1 @@
-netty=com.mini.remoting.netty.NettyRpcClient
+nt=com.mini.remoting.netty.NettyRpcClient
