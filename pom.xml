@@ -16,6 +16,7 @@
         <module>rpc-common</module>
         <module>rpc-remoting</module>
         <module>rpc-spring-starter</module>
+        <module>rpc-facade</module>
     </modules>
 
     <properties>

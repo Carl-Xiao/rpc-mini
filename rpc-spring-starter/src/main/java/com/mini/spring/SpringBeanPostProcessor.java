@@ -2,6 +2,7 @@ package com.mini.spring;
 
 import com.mini.extention.ExtensionLoader;
 import com.mini.registry.model.ServiceMeta;
+import com.mini.registry.service.RpcServiceHelper;
 import com.mini.registry.service.ServiceRegistry;
 import com.mini.remoting.AbstractClient;
 import com.mini.remoting.proxy.RpcProxy;
@@ -32,6 +33,7 @@ public class SpringBeanPostProcessor implements BeanPostProcessor {
         this.rpcClient = ExtensionLoader.getExtensionLoader(AbstractClient.class).getExtension("netty");
         this.serviceRegistry = ExtensionLoader.getExtensionLoader(ServiceRegistry.class).getExtension("zk");
     }
+
     /**
      * 注入前
      *
@@ -58,6 +60,8 @@ public class SpringBeanPostProcessor implements BeanPostProcessor {
             serviceMeta.setServiceVersion(serviceVersion);
             try {
                 serviceRegistry.register(serviceMeta);
+                String key = RpcServiceHelper.buildServiceKey(serviceMeta.getServiceName(), serviceMeta.getServiceVersion());
+                LocalService.storeService(key, bean);
             } catch (Exception e) {
                 e.printStackTrace();
             }
