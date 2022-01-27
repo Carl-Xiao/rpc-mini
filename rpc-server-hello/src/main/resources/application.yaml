@@ -1,3 +1,5 @@
 netty:
   address: 127.0.0.1
   port: 9080
+rpc:
+  base-package: com.rpc.server.facade

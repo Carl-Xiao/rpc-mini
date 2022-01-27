@@ -82,6 +82,12 @@
             <version>2.12.0</version>
         </dependency>
         <!--zookeeper curator end-->
+
+        <dependency>
+            <groupId>com.google.guava</groupId>
+            <artifactId>guava</artifactId>
+            <version>21.0</version>
+        </dependency>
     </dependencies>
 
 

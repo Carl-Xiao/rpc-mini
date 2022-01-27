@@ -37,9 +37,9 @@ public class ZookeeperRegistry implements ServiceRegistry {
      * 注册中心
      */
     private final ServiceDiscovery<ServiceMeta> serviceDiscovery;
-
-
-    public ZookeeperRegistry(String registryAddr) throws Exception {
+    //TODO zk地址传递
+    private final String registryAddr = "127.0.0.1:2181";
+    public ZookeeperRegistry() throws Exception {
         /**
          * 启动zk会话
          */

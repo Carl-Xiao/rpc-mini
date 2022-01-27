@@ -2,7 +2,9 @@ package com.mini.spring;
 
 import com.mini.rpc.annoation.RpcScan;
 import com.mini.rpc.annoation.RpcService;
+import com.mini.spring.config.RpcProperties;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.beans.factory.support.BeanDefinitionRegistry;
 import org.springframework.context.ResourceLoaderAware;
 import org.springframework.context.annotation.ImportBeanDefinitionRegistrar;
@@ -12,21 +14,23 @@ import org.springframework.core.type.AnnotationMetadata;
 import org.springframework.core.type.StandardAnnotationMetadata;
 import org.springframework.stereotype.Component;
 
+import javax.annotation.Resource;
+
 /**
  * @author carl-xiao
  * @description
  **/
 @Slf4j
 public class CustomScannerRegistrar implements ImportBeanDefinitionRegistrar, ResourceLoaderAware {
-    //TODO 动态读取路径
+    @Resource
+    RpcProperties rpcProperties;
     private final String SPRING_BEAN_BASE_PACKAGE;
     private static final String BASE_PACKAGE_ATTRIBUTE_NAME = "basePackage";
 
-    private ResourceLoader resourceLoader;
-
-    public CustomScannerRegistrar(String SPRING_BEAN_BASE_PACKAGE) {
-        this.SPRING_BEAN_BASE_PACKAGE = SPRING_BEAN_BASE_PACKAGE;
+    public CustomScannerRegistrar() {
+        SPRING_BEAN_BASE_PACKAGE = rpcProperties.getBasePackage();
     }
+    private ResourceLoader resourceLoader;
 
     @Override
     public void setResourceLoader(ResourceLoader resourceLoader) {
@@ -35,6 +39,8 @@ public class CustomScannerRegistrar implements ImportBeanDefinitionRegistrar, Re
 
     @Override
     public void registerBeanDefinitions(AnnotationMetadata annotationMetadata, BeanDefinitionRegistry registry) {
+        log.info("========================");
+        System.out.println("==================registerBeanDefinitions=============");
         AnnotationAttributes rpcScanAnnotationAttributes =
                 AnnotationAttributes.fromMap(annotationMetadata.getAnnotationAttributes(RpcScan.class.getName()));
         //获取base扫描类

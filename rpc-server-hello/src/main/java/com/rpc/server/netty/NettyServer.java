@@ -46,6 +46,7 @@ public class NettyServer implements InitializingBean {
                     })
                     .childOption(ChannelOption.SO_KEEPALIVE, true);
             ChannelFuture channelFuture = bootstrap.bind(this.serverAddress, this.serverPort).sync();
+            System.out.println("netty server start");
             log.info("server addr {} started on port {}", this.serverAddress, this.serverPort);
             channelFuture.channel().closeFuture().sync();
         } catch (InterruptedException e) {

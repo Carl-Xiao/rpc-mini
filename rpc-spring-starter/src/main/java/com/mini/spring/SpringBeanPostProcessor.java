@@ -11,7 +11,6 @@ import com.mini.rpc.annoation.RpcService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.config.BeanPostProcessor;
-import org.springframework.stereotype.Component;
 
 import java.lang.reflect.Field;
 
@@ -20,7 +19,6 @@ import java.lang.reflect.Field;
  * @description
  **/
 @Slf4j
-@Component
 public class SpringBeanPostProcessor implements BeanPostProcessor {
     private String serverAddress;
     private Integer serverPort;
@@ -30,8 +28,8 @@ public class SpringBeanPostProcessor implements BeanPostProcessor {
     public SpringBeanPostProcessor(String serverAddress, int serverPort) {
         this.serverAddress = serverAddress;
         this.serverPort = serverPort;
-        this.rpcClient = ExtensionLoader.getExtensionLoader(AbstractClient.class).getExtension("netty");
         this.serviceRegistry = ExtensionLoader.getExtensionLoader(ServiceRegistry.class).getExtension("zk");
+        this.rpcClient = ExtensionLoader.getExtensionLoader(AbstractClient.class).getExtension("netty");
     }
 
     /**
@@ -44,6 +42,8 @@ public class SpringBeanPostProcessor implements BeanPostProcessor {
      */
     @Override
     public Object postProcessBeforeInitialization(Object bean, String beanName) throws BeansException {
+        log.info("-========================");
+        System.out.println("==================postProcessBeforeInitialization=============");
         if (bean.getClass().isAnnotationPresent(RpcService.class)) {
             log.info("[{}] is annotated with  [{}]", bean.getClass().getName(), RpcService.class.getCanonicalName());
             //rpc service
@@ -79,6 +79,8 @@ public class SpringBeanPostProcessor implements BeanPostProcessor {
      */
     @Override
     public Object postProcessAfterInitialization(Object bean, String beanName) throws BeansException {
+        log.info("========================");
+        System.out.println("==================postProcessAfterInitialization=============");
         Class<?> targetClass = bean.getClass();
         Field[] declaredFields = targetClass.getDeclaredFields();
         for (Field declaredField : declaredFields) {
